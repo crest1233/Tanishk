@@ -1,46 +1,42 @@
-/*===== MENU SHOW =====*/ 
-const showMenu = (toggleId, navId) =>{
+/*===== MENU SHOW =====*/
+const showMenu = (toggleId, navId) => {
     const toggle = document.getElementById(toggleId),
-    nav = document.getElementById(navId)
-
-    if(toggle && nav){
-        toggle.addEventListener('click', ()=>{
-            nav.classList.toggle('show')
-        })
+          nav = document.getElementById(navId);
+    if (toggle && nav) {
+        toggle.addEventListener('click', () => {
+            nav.classList.toggle('show');
+        });
     }
 }
-showMenu('nav-toggle','nav-menu')
+showMenu('nav-toggle', 'nav-menu');
 
-/*==================== REMOVE MENU MOBILE ====================*/
-const navLink = document.querySelectorAll('.nav__link')
-
-function linkAction(){
-    const navMenu = document.getElementById('nav-menu')
-    // When we click on each nav__link, we remove the show-menu class
-    navMenu.classList.remove('show')
+/*===== REMOVE MENU MOBILE =====*/
+const navLink = document.querySelectorAll('.nav__link');
+function linkAction() {
+    const navMenu = document.getElementById('nav-menu');
+    navMenu.classList.remove('show');
 }
-navLink.forEach(n => n.addEventListener('click', linkAction))
+navLink.forEach(n => n.addEventListener('click', linkAction));
 
-/*==================== SCROLL SECTIONS ACTIVE LINK ====================*/
-const sections = document.querySelectorAll('section[id]')
-
-const scrollActive = () =>{
-    const scrollDown = window.scrollY
-
-  sections.forEach(current =>{
+/*===== SCROLL SECTIONS ACTIVE LINK =====*/
+const sections = document.querySelectorAll('section[id]');
+const scrollActive = () => {
+    const scrollDown = window.scrollY;
+    sections.forEach(current => {
         const sectionHeight = current.offsetHeight,
               sectionTop = current.offsetTop - 58,
               sectionId = current.getAttribute('id'),
-              sectionsClass = document.querySelector('.nav__menu a[href*=' + sectionId + ']')
-        
-        if(scrollDown > sectionTop && scrollDown <= sectionTop + sectionHeight){
-            sectionsClass.classList.add('active-link')
-        }else{
-            sectionsClass.classList.remove('active-link')
-        }                                                    
-    })
+              sectionsClass = document.querySelector('.nav__menu a[href*=' + sectionId + ']');
+        if (sectionsClass) {
+            if (scrollDown > sectionTop && scrollDown <= sectionTop + sectionHeight) {
+                sectionsClass.classList.add('active-link');
+            } else {
+                sectionsClass.classList.remove('active-link');
+            }
+        }
+    });
 }
-window.addEventListener('scroll', scrollActive)
+window.addEventListener('scroll', scrollActive);
 
 /*===== SCROLL REVEAL ANIMATION =====*/
 const sr = ScrollReveal({
@@ -48,28 +44,43 @@ const sr = ScrollReveal({
     distance: '60px',
     duration: 2000,
     delay: 200,
-//     reset: true
+    reset: false
 });
+sr.reveal('.home__data, .about__img, .skills__subtitle, .skills__text', {});
+sr.reveal('.home__img, .about__subtitle, .about__text, .skills__img', { delay: 400 });
+sr.reveal('.home__social-icon', { interval: 200 });
+sr.reveal('.skills__data, .work__img, .contact__input', { interval: 200 });
 
-sr.reveal('.home__data, .about__img, .skills__subtitle, .skills__text',{}); 
-sr.reveal('.home__img, .about__subtitle, .about__text, .skills__img',{delay: 400}); 
-sr.reveal('.home__social-icon',{ interval: 200}); 
-sr.reveal('.skills__data, .work__img, .contact__input',{interval: 200}); 
+/*===== CONTACT FORM SUBMISSION =====*/
 document.addEventListener('DOMContentLoaded', function() {
-    const homeSection = document.querySelector('.home');
-    const body = document.body;
+    const contactForm = document.getElementById('contact-form');
+    const contactButton = document.querySelector('.contact__button');
 
-    // Function to toggle color scheme
-    function toggleColorScheme() {
-        homeSection.classList.toggle('white-bg');
-        body.classList.toggle('white-text');
+    if (contactForm && contactButton) {
+        contactForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            contactButton.disabled = true;
+            contactButton.value = 'Sending...';
+
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: new FormData(contactForm),
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    alert('Message sent successfully! Thank you for reaching out.');
+                    contactForm.reset();
+                } else {
+                    alert('Failed to send message. Please try again later.');
+                }
+            } catch (error) {
+                alert('An error occurred. Please check your connection and try again.');
+            } finally {
+                contactButton.disabled = false;
+                contactButton.value = 'Send';
+            }
+        });
     }
-
-    // Call the toggleColorScheme function on scroll or any other event
-    // For demonstration, let's toggle the color scheme on scroll
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 100) {
-            toggleColorScheme();
-        }
-    });
 });
